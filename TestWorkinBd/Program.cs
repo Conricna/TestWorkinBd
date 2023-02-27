@@ -70,7 +70,7 @@ namespace TestWorkinBd
 
 
             con.Open();
-
+            // e-mail уполномоченных лиц заключивших договора за последнии 30 дней, сумма которых выше 40 000
             string sql3 = "SELECT contract.individual_id, firstname , email ,SUM(contractsum) as allcontractsum , DATE(data) as date " +
                  " FROM contract LEFT JOIN individual ON contract.individual_id = individual.individual_id " +
                  " WHERE status = 'заключён'" +
@@ -79,7 +79,7 @@ namespace TestWorkinBd
                  " order by individual_id ASC";
 
 
-            // e-mail уполномоченных лиц заключивших договора за последнии 30 дней, сумма которых выше 40 000
+            
             using var cmd3 = new NpgsqlCommand(sql3, con);
             Console.WriteLine("\nЗадание #3\n");
             Console.WriteLine("e-mail уполномоченных лиц заключивших договора за последнии 30 дней, сумма которых выше 40 000:\n");
@@ -99,6 +99,29 @@ namespace TestWorkinBd
            
             con.Close();
 
+
+            con.Open();
+            // статус договора расторгнут если возраст больше 60
+            string sql4 = "UPDATE contract AS ne SET status = 'расторгнут' " +
+                 " FROM individual AS ind " +
+                 " WHERE ne.individual_id = ind.individual_id AND status = 'заключён' AND ind.age >= 60";
+
+
+           
+            using var cmd4 = new NpgsqlCommand(sql4, con);
+            Console.WriteLine("\nЗадание #4\n");
+            Console.WriteLine("статус договора расторгнут если возраст больше 60:\n");
+            using NpgsqlDataReader rdr4 = cmd4.ExecuteReader();
+
+            while (rdr4.Read())
+            {
+               
+                Console.WriteLine("Данные Были измененны");
+
+            }
+
+            con.Close();
+
             con.Open();
             //	Создать отчет в фориате json
 
@@ -112,7 +135,7 @@ namespace TestWorkinBd
             using var cmd5 = new NpgsqlCommand(sql5, con);
 
             Console.WriteLine("\nЗадание #5\n");
-            Console.WriteLine("	Создать отчет в фориате json:\n");
+            Console.WriteLine("Создать отчет в фориате json:\n");
             using NpgsqlDataReader rdr5 = cmd5.ExecuteReader();
 
             Json json = new Json();
